@@ -35,10 +35,12 @@ Script {
         var sorted = noteIds.sort((a, b) => b - a) // reorder the notes 
                             .map(id => script.fetchNoteById(id)); 
 
-        var newHeader = sorted[0].noteText.toString().split('\n').filter(x => x!='').slice(0, 3).join('\n'); 
+        var newHeader = sorted[0].noteText.toString().split('\n').filter(x => x!='').slice(0, 3); 
 
-        var newNote = sorted.map(note => note.noteText.split('\n').filter(x => x!='').slice(3).join('\n')).join(noteSeparator); 
+        var newText = sorted.map(note => note.noteText.split('\n').filter(x => x!='').slice(3).join('\n')).join(noteSeparator); 
 
-        script.createNote([newHeader, newNote].join('\n\n')); 
+        newHeader[0] = script.inputDialogGetText("note name", "Please specify a name", newHeader[0]); 
+
+        script.createNote([newHeader.join('\n'), newText].join('\n\n')); 
     }
 }
