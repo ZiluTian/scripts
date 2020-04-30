@@ -31,16 +31,31 @@ Script {
         }
 
         var sorted = noteIds.sort((a, b) => b - a) // reorder the notes 
-                                 .map(id => script.fetchNoteById(id)); 
-        var mergedLink = sorted[0].noteText.toString().split('\n').filter(x => x.indexOf('html')!=-1)[0]; 
+                            .map(id => script.fetchNoteById(id)); 
+        var protocols = ['http://', 'https://', 'file://']; 
+
+        var allLinks = []; 
+        var firstNoteTextss = sorted[0].noteText.toString().split('\n'); 
+        protocols.forEach(protocol => {
+            var res = firstNoteTextss.filter(
+                x => x.indexOf(protocol)!=-1
+            )
+            if (res.length > 0){
+                allLinks.push([protocol, res])
+            }
+        }); 
+
+        var mergedLink = allLinks[0]; 
+
         var mergedTitle = sorted[0].name; 
         var titleSeparator = '=====================================';  // markdown 
 
-        var newNote = [[mergedTitle, titleSeparator].join('\n'), mergedLink]
+        var newNote = [[mergedTitle, titleSeparator].join('\n'), mergedLink[1]]
           .concat(sorted.map(note => note.noteText.substring(note.name.toString().length).split('\n')
                                     .filter(x => x!='')
                                     .filter(x => x.indexOf('====')==-1)
-                                    .filter(x => x.indexOf('html')==-1).join('\n')))
+                                    .filter(x => x.indexOf(mergedLink[0])==-1)
+                                    .join('\n')))
           .join('\n\n'); 
         script.createNote(newNote); 
     }
